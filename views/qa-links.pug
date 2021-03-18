@@ -1,0 +1,37 @@
+extends template.pug
+
+block append stylesheets
+    link(rel="stylesheet", type="text/css", href="css/timesheet-widget.css")
+
+block content
+    
+    #qa-links.container-xl
+        .card-content.links-container
+            .row.mb-3.collection-selector
+                label.col-sm-2.col-form-label.col-form-label-sm(for='colFormLabelSm') Collection:
+                .col-sm-10
+                    select#facility-selector.form-select.form-control-sm(ref='collections' v-on:change="updateList()")
+                        each collection in (COLLECTIONS || [])
+                            option(value=collection)= collection
+        .table-responsive.mt-1.links-container
+            table
+                thead
+                    tr
+                        th 
+                            input(type='checkbox' v-model="checkAll")
+                        th.collection-name Name
+                            span.link(v-on:click="openAll('" + REFERRAL + "/')")
+                                |  (open checked)
+                tbody
+                    tr(v-for='(item, key, index) in qaLinks')
+                        td
+                            input(type='checkbox' v-model="item.checked")
+                        td.collection-name.link(v-on:click="openUrl('" + REFERRAL + "/' + item.url)")
+                            | {{ item.name }}
+
+        .row.spreadsheet-link
+            a(href='https://docs.google.com/spreadsheets/d/1iwRoeADvmNZ-6gdFQDIqt4f_4SBJL0uBmLLJZt4oyO4/edit#gid=1659593592')
+                | Spreadsheet Configs
+
+block append scripts
+    script(src='js/qa-links.js')
