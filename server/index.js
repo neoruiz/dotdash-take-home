@@ -12,12 +12,16 @@ const tmdb_url = 'https://api.themoviedb.org/3';
 app.set('view engine', 'pug');
 app.use(cors());
 
+let image_base_url;
+let poster_sizes;
+
 axios.get(`${tmdb_url}/configuration`, {
 	params: {
 		'api_key': api_key
 	}
 }).then((config) => {
-	//console.log(config.data);
+	image_base_url = config.data.images.base_url;
+	poster_sizes = config.data.images.poster_sizes;
 });
 
 
@@ -51,7 +55,7 @@ app.get('/:tv_id/images', function (request, response) {
 		response.send({
 			images: results.data.posters.map(image => {
 				return {
-					path : image.file_path,
+					path : `${image_base_url}/w500/${image.file_path}`,
 					height: image.height,
 					width: image.width,
 					aspect_ratio: image.aspect_ratio
@@ -91,15 +95,15 @@ const getDetails = ( shows, showURLs) => {
 
 				shows.results = shows.results.map((show) => {
 					return {
+						...details.filter((detail) => {
+							return detail.data.id == show.id;
+						})[0].data,
 						id: show.id,
 						name: show.name,
 						first_air_date: show.first_air_date,
 						overview: show.overview,
 						popularity: show.popularity,
-						poster_path: show.poster_path,
-						...details.filter((detail) => {
-							return detail.data.id == show.id;
-						})[0].data
+						poster_path: `${image_base_url}/w500/${show.poster_path}`
 					}
 				});
 
