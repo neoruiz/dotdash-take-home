@@ -30,7 +30,8 @@ app.get('/search', function (request, response) {
 	axios.get(`${tmdb_url}/search/tv`, {
 		params: {
 			'api_key': api_key,
-			'query': request.query.query || 'Airbender'
+			'query': request.query.query || 'Airbender',
+			'page': request.query.page || 1,
 		}
 	}).then((results) => {
 
