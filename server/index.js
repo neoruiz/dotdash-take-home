@@ -37,6 +37,7 @@ app.get('/search', function (request, response) {
 
 		getDetails( results.data )
 			.then((shows) => getSeasons(shows))
+			.then((shows) => getCast(shows))
 			.then((shows) => {
 				response.send({
 					result: shows
@@ -67,6 +68,20 @@ app.get('/:tv_id/images', function (request, response) {
 	}).catch((error) => console.log(error));
 });
 
+/* GET CREDITS */
+app.get('/:tv_id/credits', function (request, response) {
+	axios.get(`${tmdb_url}/tv/${request.params.tv_id}/credits`, {
+		params: {
+			'api_key': api_key
+		}
+	}).then((results) => {
+		response.send({
+			cast: results.data
+		});
+	
+	}).catch((error) => console.log(error));
+});
+
 /* GET TV RECOMMENDATIONS */
 app.get('/:tv_id/recommendations', function (request, response) {
 	axios.get(`${tmdb_url}/tv/${request.params.tv_id}/recommendations`, {
@@ -77,6 +92,7 @@ app.get('/:tv_id/recommendations', function (request, response) {
 
 		getDetails( results.data )
 			.then((shows) => getSeasons(shows))
+			.then((shows) => getCast(shows))
 			.then((shows) => {
 				response.send({
 					result: shows
@@ -87,7 +103,7 @@ app.get('/:tv_id/recommendations', function (request, response) {
 });
 
 /* GET SHOW DETAILS */
-const getDetails = ( shows, showURLs) => {
+const getDetails = ( shows ) => {
 	return new Promise((resolve, reject) => {
 		Promise.all(
 			shows.results.map((tv_show) => {
@@ -105,6 +121,30 @@ const getDetails = ( shows, showURLs) => {
 						overview: show.overview,
 						popularity: show.popularity,
 						poster_path: (show.poster_path ? `${image_base_url}/w500${show.poster_path}` : 'https://dotdash-takehome.herokuapp.com/images/no-poster.jpg')
+					}
+				});
+
+				resolve(shows);
+
+			});
+	});
+}
+
+/* GET SHOW CAST */
+const getCast = ( shows ) => {
+	return new Promise((resolve, reject) => {
+		Promise.all(
+			shows.results.map((tv_show) => {
+				return axios.get(`${tmdb_url}/tv/${tv_show.id}/credits?api_key=${api_key}`);
+			})).then(( casts ) => {
+				
+				shows.results = shows.results.map((show) => {
+					return {
+						...show,
+						cast: casts.filter((castDetails) => {
+							console.log(castDetails.data.id, show.id);
+							return castDetails.data.id == show.id;
+						})[0].data.cast
 					}
 				});
 
