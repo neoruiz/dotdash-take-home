@@ -10,6 +10,7 @@ const api_key = 'a407cbcbf42b0279e4d9d86b95539926';
 const tmdb_url = 'https://api.themoviedb.org/3';
 
 app.set('view engine', 'pug');
+app.use(cors());
 
 axios.get(`${tmdb_url}/configuration`, {
 	params: {
