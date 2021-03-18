@@ -92,7 +92,7 @@ const getDetails = ( shows, showURLs) => {
 			shows.results.map((tv_show) => {
 				return axios.get(`${tmdb_url}/tv/${tv_show.id}?api_key=${api_key}`);
 			})).then(( details ) => {
-
+				
 				shows.results = shows.results.map((show) => {
 					return {
 						...details.filter((detail) => {
@@ -103,7 +103,7 @@ const getDetails = ( shows, showURLs) => {
 						first_air_date: show.first_air_date,
 						overview: show.overview,
 						popularity: show.popularity,
-						poster_path: `${image_base_url}/w500/${show.poster_path}`
+						poster_path: (show.poster_path ? `${image_base_url}/w500${show.poster_path}` : 'https://dotdash-takehome.herokuapp.com/images/no-poster.jpg')
 					}
 				});
 
